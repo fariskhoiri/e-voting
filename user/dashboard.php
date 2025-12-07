@@ -284,12 +284,148 @@ $candidates = $conn->query("
                 text-align: center;
             }
         }
+
+        .candidate-card {
+            position: relative;
+            padding-top: 80px; /* Space for photo */
+        }
+        
+        .candidate-photo-container {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            background: white;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .candidate-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .candidate-info {
+            text-align: center;
+            padding-top: 50px; /* Adjusted for photo */
+        }
+        
+        .candidate-name {
+            font-size: 1.6rem;
+            color: #333;
+            margin: 50px 0 10px 0;
+        }
+        
+        .party-name {
+            color: #667eea;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            font-size: 1.2rem;
+        }
+        
+        .candidate-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 60px;
+        }
+        
+        .vote-count {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .votes-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+        
+        .votes-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .percentage-container {
+            margin: 15px 0;
+        }
+        
+        .percentage-text {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .no-photo-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .photo-credit {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .candidate-photo-container {
+                width: 100px;
+                height: 100px;
+                top: -30px;
+            }
+            
+            .candidate-card {
+                padding-top: 60px;
+            }
+            
+            .candidate-info {
+                padding-top: 40px;
+            }
+        }
     </style>
+    <script>
+        // Function to handle broken images
+        function handleImageError(img) {
+            img.onerror = null;
+            const container = img.parentElement;
+            const placeholder = document.createElement('div');
+            placeholder.className = 'photo-placeholder';
+            placeholder.innerHTML = img.alt ? img.alt.charAt(0).toUpperCase() : '?';
+            container.replaceChild(placeholder, img);
+        }
+    </script>
 </head>
 
 <body>
-    <div class="header">
-        <h1 style="margin: 0; color: #333;">Presidential Election 2024</h1>
+<div class="header">
+        <h1 style="margin: 0; color: #333;">Presidential Election 2025</h1>
         <div class="nav">
             <span style="color: #666; margin-right: 15px;">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
             <?php if ($_SESSION['has_voted']): ?>
@@ -301,10 +437,10 @@ $candidates = $conn->query("
             <a href="../logout.php">Logout</a>
         </div>
     </div>
-
+    
     <div class="dashboard-container">
         <h2 class="page-title">Election Results Live</h2>
-
+        
         <?php if ($_SESSION['has_voted']): ?>
             <div class="status-message">
                 ✅ Thank you for participating in the election! Your vote has been recorded.
@@ -314,7 +450,7 @@ $candidates = $conn->query("
                 ⚠️ You haven't voted yet. <a href="vote.php" style="color: #856404; font-weight: bold;">Click here to vote</a> before the election ends!
             </div>
         <?php endif; ?>
-
+        
         <div class="results-summary">
             <div>
                 <h3 style="margin: 0; color: #333;">Live Election Results</h3>
@@ -326,60 +462,82 @@ $candidates = $conn->query("
                 </div>
             <?php endif; ?>
         </div>
-
+        
         <?php if ($candidates->num_rows > 0): ?>
             <div class="candidates-grid">
-                <?php
+                <?php 
                 $isFirst = true;
-                while ($candidate = $candidates->fetch_assoc()):
+                while ($candidate = $candidates->fetch_assoc()): 
                 ?>
                     <div class="candidate-card">
-                        <?php if ($isFirst && $candidate['votes'] > 0): ?>
-                            <div class="leading-badge">Current Leader</div>
-                            <?php $isFirst = false; ?>
-                        <?php endif; ?>
-
-                        <h3 class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></h3>
-                        <p class="party-name"><?php echo htmlspecialchars($candidate['party']); ?></p>
-
-                        <p class="candidate-description"><?php echo htmlspecialchars($candidate['description']); ?></p>
-
-                        <div class="vote-count">
-                            <div class="votes-number"><?php echo $candidate['votes']; ?></div>
-                            <div class="votes-label">votes</div>
-                        </div>
-
-                        <div class="percentage-container">
-                            <div class="percentage-text"><?php echo $candidate['percentage']; ?>% of total votes</div>
-                            <div class="percentage-bar-bg">
-                                <div class="percentage-bar-fill" style="width: <?php echo $candidate['percentage']; ?>%;">
-                                    <?php if ($candidate['percentage'] > 15): ?>
-                                        <?php echo $candidate['percentage']; ?>%
-                                    <?php endif; ?>
+                        <!-- Candidate Photo -->
+                        <div class="candidate-photo-container">
+                            <?php if ($candidate['photo_filename']): ?>
+                                <img src="../uploads/candidate_photos/<?php echo htmlspecialchars($candidate['photo_filename']); ?>" 
+                                     alt="<?php echo htmlspecialchars($candidate['name']); ?>"
+                                     class="candidate-photo"
+                                     onerror="handleImageError(this)">
+                            <?php else: ?>
+                                <div class="photo-placeholder">
+                                    <?php echo strtoupper(substr($candidate['name'], 0, 1)); ?>
                                 </div>
-                            </div>
-                            <?php if ($candidate['percentage'] <= 15): ?>
-                                <small style="color: #666;"><?php echo $candidate['percentage']; ?>%</small>
                             <?php endif; ?>
                         </div>
-
-                        <?php if (!$_SESSION['has_voted']): ?>
-                            <a href="vote.php">
-                                <button class="vote-button">Vote for <?php echo htmlspecialchars($candidate['name']); ?></button>
-                            </a>
-                        <?php else: ?>
-                            <button class="vote-button" disabled>
-                                <?php if ($candidate['votes'] > 0): ?>
-                                    Viewing Results
-                                <?php else: ?>
-                                    No Votes Yet
-                                <?php endif; ?>
-                            </button>
+                        
+                        <?php if ($isFirst && $candidate['votes'] > 0): ?>
+                            <div class="leading-badge">🏆 Current Leader</div>
+                            <?php $isFirst = false; ?>
                         <?php endif; ?>
+                        
+                        <div class="candidate-info">
+                            <h3 class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></h3>
+                            <p class="party-name"><?php echo htmlspecialchars($candidate['party']); ?></p>
+                            
+                            <p class="candidate-description"><?php echo htmlspecialchars($candidate['description']); ?></p>
+                            
+                            <div class="vote-count">
+                                <div class="votes-number"><?php echo $candidate['votes']; ?></div>
+                                <div class="votes-label">votes</div>
+                            </div>
+                            
+                            <div class="percentage-container">
+                                <div class="percentage-text"><?php echo $candidate['percentage']; ?>% of total votes</div>
+                                <div class="percentage-bar-bg">
+                                    <div class="percentage-bar-fill" style="width: <?php echo $candidate['percentage']; ?>%;">
+                                        <?php if ($candidate['percentage'] > 15): ?>
+                                            <?php echo $candidate['percentage']; ?>%
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <?php if ($candidate['percentage'] <= 15): ?>
+                                    <small style="color: #666;"><?php echo $candidate['percentage']; ?>%</small>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <?php if (!$_SESSION['has_voted']): ?>
+                                <a href="vote.php">
+                                    <button class="vote-button">Vote for <?php echo htmlspecialchars($candidate['name']); ?></button>
+                                </a>
+                            <?php else: ?>
+                                <button class="vote-button" disabled>
+                                    <?php if ($candidate['votes'] > 0): ?>
+                                        ✅ Vote Recorded
+                                    <?php else: ?>
+                                        No Votes Yet
+                                    <?php endif; ?>
+                                </button>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 <?php endwhile; ?>
             </div>
-
+            
+            <!-- Notice about photos -->
+            <!--<div class="no-photo-notice">
+                ℹ️ Some candidates may not have photos uploaded yet. Contact the administrator if you notice missing photos.
+            </div>-->
+            
+            <!-- Statistics section remains the same -->
             <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
                 <h3 style="color: #333; margin-top: 0;">Election Statistics</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
@@ -390,15 +548,15 @@ $candidates = $conn->query("
                         <strong>Total Votes:</strong> <?php echo $totalVotes; ?>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 5px;">
-                        <strong>Leading Candidate:</strong>
-                        <?php
-                        $candidates->data_seek(0);
-                        $leading = $candidates->fetch_assoc();
-                        if ($leading && $leading['votes'] > 0) {
-                            echo htmlspecialchars($leading['name']) . " (" . $leading['percentage'] . "%)";
-                        } else {
-                            echo "No votes yet";
-                        }
+                        <strong>Leading Candidate:</strong> 
+                        <?php 
+                            $candidates->data_seek(0);
+                            $leading = $candidates->fetch_assoc();
+                            if ($leading && $leading['votes'] > 0) {
+                                echo htmlspecialchars($leading['name']) . " (" . $leading['percentage'] . "%)";
+                            } else {
+                                echo "No votes yet";
+                            }
                         ?>
                     </div>
                 </div>

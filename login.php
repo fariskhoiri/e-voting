@@ -240,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="register-link">
-            Tidak punya akun? <a href="#">Daftar disini</a>
+            Tidak punya akun? <a href="https://wa.link/uz3ox6" target="_blank">Daftar disini</a>
         </div>
 
         <!-- 
