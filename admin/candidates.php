@@ -28,12 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
         }
     } elseif (isset($_POST['delete'])) {
-        $id = $_POST['id'];
+        $id = (int) $_POST['id'];
+
+        // Hapus dulu semua votes yang terkait kandidat ini
+        $stmt = $conn->prepare("DELETE FROM votes WHERE candidate_id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+
+        // Baru hapus kandidatnya
         $stmt = $conn->prepare("DELETE FROM candidates WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $stmt->close();
-        $message = "Kandidat telah dihapus!";
+
+        $message = "Kandidat dan data vote terkait berhasil dihapus!";
     }
 }
 

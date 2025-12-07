@@ -42,7 +42,6 @@ if (isLoggedIn()) {
 
         body {
             font-family: 'Poppins', sans-serif;
-            /* Background Gradient yang elegan */
             background: url('indo-anniversary.png');
             background-size: cover;
             background-position: center;
@@ -183,8 +182,8 @@ if (isLoggedIn()) {
             <a href="login.php" class="btn btn-primary">
                 <i class="fas fa-sign-in-alt"></i> Login
             </a>
-            <a href="register.php" class="btn btn-secondary">
-                <i class="fas fa-user-plus"></i> Register
+            <a href="https://wa.link/uz3ox6" class="btn btn-secondary" target="_blank">
+                <i class="fa-brands fa-whatsapp"></i> Register
             </a>
         </div>
     </div>

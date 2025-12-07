@@ -562,7 +562,7 @@ $stats = $conn->query("
             margin-top: 20px;
         }
 
-        .export-buttons {
+        /*.export-buttons {
             margin-top: 20px;
             display: flex;
             gap: 10px;
@@ -575,7 +575,7 @@ $stats = $conn->query("
 
         .btn-export:hover {
             background: #218838;
-        }
+        }*/
 
         .pagination {
             display: flex;
@@ -973,8 +973,8 @@ $stats = $conn->query("
             const username = document.getElementById('username').value.trim();
             const checkSpan = document.getElementById('username-check');
 
-            if (username.length < 3) {
-                checkSpan.innerHTML = '<span style="color: #ffc107;">Minimum 3 characters</span>';
+            if (username.length < 12) {
+                checkSpan.innerHTML = '<span style="color: #ffc107;">Minimum 12 characters</span>';
                 return;
             }
 
