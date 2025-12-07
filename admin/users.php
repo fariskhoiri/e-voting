@@ -1036,7 +1036,7 @@ $stats = $conn->query("
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" required
                         placeholder="Enter password">
-                    <div class="password-hint">Minimum 4 characters</div>
+                    <!--<div class="password-hint">Minimum 4 characters</div>-->
                 </div>
 
                 <div class="form-group">
