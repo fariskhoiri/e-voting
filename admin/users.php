@@ -12,7 +12,57 @@ $user_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // Handle actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['reset_password'])) {
+    // Handle add new user
+    if (isset($_POST['add_user'])) {
+        $username = trim($_POST['username']);
+        $password = trim($_POST['password']);
+        $confirm_password = trim($_POST['confirm_password']);
+        $role = $_POST['role'];
+
+        // Validation
+        if (empty($username) || empty($password)) {
+            $message = '<div class="error">Username and password are required!</div>';
+        } elseif (strlen($username) < 3) {
+            $message = '<div class="error">Username must be at least 3 characters!</div>';
+        } elseif (strlen($password) < 4) {
+            $message = '<div class="error">Password must be at least 4 characters!</div>';
+        } elseif ($password !== $confirm_password) {
+            $message = '<div class="error">Passwords do not match!</div>';
+        } else {
+            // Check if username already exists
+            $checkStmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+            $checkStmt->bind_param("s", $username);
+            $checkStmt->execute();
+            $checkResult = $checkStmt->get_result();
+
+            if ($checkResult->num_rows > 0) {
+                $message = '<div class="error">Username already exists! Please choose a different username.</div>';
+            } else {
+                // Insert new user
+                $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+                $stmt->bind_param("sss", $username, $password, $role);
+
+                if ($stmt->execute()) {
+                    $new_user_id = $stmt->insert_id;
+
+                    // Log the user creation
+                    $admin_id = $_SESSION['user_id'];
+                    $stmt2 = $conn->prepare("INSERT INTO user_creation_logs (admin_id, user_id, created_at) VALUES (?, ?, NOW())");
+                    $stmt2->bind_param("ii", $admin_id, $new_user_id);
+                    $stmt2->execute();
+                    $stmt2->close();
+
+                    $message = '<div class="success">User "' . htmlspecialchars($username) . '" created successfully!</div>';
+                } else {
+                    $message = '<div class="error">Error creating user: ' . $conn->error . '</div>';
+                }
+                $stmt->close();
+            }
+            $checkStmt->close();
+        }
+    }
+    // Handle reset password (existing code)
+    elseif (isset($_POST['reset_password'])) {
         $user_id = intval($_POST['user_id']);
         $new_password = trim($_POST['new_password']);
         $confirm_password = trim($_POST['confirm_password']);
@@ -589,6 +639,222 @@ $stats = $conn->query("
                 grid-template-columns: 1fr;
             }
         }
+
+        .add-user-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-user-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .add-user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .add-user-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .toggle-add-form {
+            background: #6c757d;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .toggle-add-form:hover {
+            background: #545b62;
+        }
+
+        /*.password-hint {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .quick-add-section {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .quick-add-title {
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-add-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-add-btn {
+            padding: 12px;
+            background: white;
+            border: 2px solid #007bff;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .quick-add-btn:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .quick-add-btn h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .quick-add-btn:hover h4 {
+            color: white;
+        }
+
+        .quick-add-btn p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .quick-add-btn:hover p {
+            color: rgba(255, 255, 255, 0.9);
+        }*/
+
+        /* Add User Modal */
+        #addUserModal .modal-content {
+            max-width: 600px;
+        }
+
+        .role-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-option:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+
+        .role-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .role-option label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .role-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-left: 25px;
+        }
+
+        /*.auto-generate {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .generate-btn {
+            background: #17a2b8;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .generate-btn:hover {
+            background: #138496;
+        }*/
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .add-user-form {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-add-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
     <script>
         function openModal(modalId, userId, username) {
@@ -631,6 +897,103 @@ $stats = $conn->query("
                 event.target.style.display = 'none';
             }
         }
+
+        function openAddUserModal() {
+            document.getElementById('addUserModal').style.display = 'flex';
+        }
+
+        /*function generatePassword() {
+            const length = 8;
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            let password = "";
+            for (let i = 0; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            document.getElementById('password').value = password;
+            document.getElementById('confirm_password').value = password;
+        }
+
+        function generateUsername() {
+            const prefixes = ['user', 'voter', 'member', 'participant'];
+            const suffixes = ['2024', 'election', 'vote', 'user'];
+            const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+            const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+            const randomNum = Math.floor(Math.random() * 1000);
+            const username = `${prefix}_${suffix}_${randomNum}`;
+            document.getElementById('username').value = username;
+        }
+
+        function quickAddUser(role, count = 1) {
+            if (!confirm(`Create ${count} new ${role} user(s) with auto-generated credentials?`)) {
+                return;
+            }
+
+            // In a real application, this would be an AJAX call
+            // For now, we'll redirect to a processing page
+            window.location.href = `quick_add_users.php?role=${role}&count=${count}`;
+        }*/
+
+        function toggleAddForm() {
+            const form = document.getElementById('addUserForm');
+            const toggleBtn = document.querySelector('.toggle-add-form');
+
+            if (form.style.display === 'none') {
+                form.style.display = 'grid';
+                toggleBtn.textContent = 'Hide Form';
+            } else {
+                form.style.display = 'none';
+                toggleBtn.textContent = 'Add New User';
+            }
+        }
+
+        function validateAddUserForm() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (username.length < 3) {
+                alert('Username must be at least 3 characters long');
+                return false;
+            }
+
+            if (password.length < 4) {
+                alert('Password must be at least 4 characters long');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return false;
+            }
+
+            return true;
+        }
+
+        function checkUsername() {
+            const username = document.getElementById('username').value.trim();
+            const checkSpan = document.getElementById('username-check');
+
+            if (username.length < 3) {
+                checkSpan.innerHTML = '<span style="color: #ffc107;">Minimum 3 characters</span>';
+                return;
+            }
+
+            if (username.length > 50) {
+                checkSpan.innerHTML = '<span style="color: #dc3545;">Maximum 50 characters</span>';
+                return;
+            }
+
+            // Simple validation
+            const usernameRegex = /^[a-zA-Z0-9_]+$/;
+            if (!usernameRegex.test(username)) {
+                checkSpan.innerHTML = '<span style="color: #dc3545;">Only letters, numbers, and underscores allowed</span>';
+                return;
+            }
+
+            checkSpan.innerHTML = '<span style="color: #28a745;">✓ Valid format</span>';
+
+            // In a real app, you could add AJAX to check availability
+        }
     </script>
 </head>
 
@@ -648,8 +1011,61 @@ $stats = $conn->query("
     <?php echo $message; ?>
 
     <div class="warning">
-        ⚠️ <strong>Important:</strong> As administrator, you can reset user passwords, manage roles, and control voting status.
+        ⚠️ <strong>Important:</strong> As administrator, you can add new users, reset user passwords, manage roles, and control voting status.
         All password resets are logged for security purposes.
+    </div>
+
+    <!-- Add New User Section -->
+    <div class="add-user-section">
+        <div class="add-user-header">
+            <div class="add-user-title">Add New User</div>
+            <button class="toggle-add-form" onclick="toggleAddForm()">Add New User</button>
+        </div>
+
+        <form id="addUserForm" method="POST" action="" onsubmit="return validateAddUserForm()" style="display: none;">
+            <div class="add-user-form">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required
+                        placeholder="Enter username"
+                        onkeyup="checkUsername()">
+                    <div id="username-check" class="password-hint"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required
+                        placeholder="Enter password">
+                    <div class="password-hint">Minimum 4 characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required
+                        placeholder="Confirm password">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="user">Regular User</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="submit" name="add_user" class="btn-add">
+                        <span style="margin-right: 5px;">+</span> Create User
+                    </button>
+                </div>
+            </div>
+
+            <!--<div class="auto-generate">
+                <button type="button" class="generate-btn" onclick="generateUsername()">Generate Username</button>
+                <button type="button" class="generate-btn" onclick="generatePassword()">Generate Password</button>
+            </div>-->
+        </form>
     </div>
 
     <div class="stats-cards">
@@ -707,10 +1123,10 @@ $stats = $conn->query("
         </form>
     </div>
 
-    <div class="export-buttons">
+    <!--<div class="export-buttons">
         <button class="btn btn-export" onclick="exportUsers('csv')">Export as CSV</button>
         <button class="btn btn-export" onclick="exportUsers('pdf')">Export as PDF</button>
-    </div>
+    </div>-->
 
     <table class="users-table">
         <thead>
@@ -767,9 +1183,9 @@ $stats = $conn->query("
                                     <?php echo $user['has_voted'] ? 'Mark Not Voted' : 'Mark Voted'; ?>
                                 </button>
 
-                                <button class="btn-small btn-role" onclick="openModal('changeRoleModal', <?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">
+                                <!--<button class="btn-small btn-role" onclick="openModal('changeRoleModal', <?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">
                                     Change Role
-                                </button>
+                                </button>-->
 
                                 <?php if ($user['role'] !== 'admin' || $user['id'] != $_SESSION['user_id']): ?>
                                     <button class="btn-small btn-delete" onclick="openModal('deleteUserModal', <?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">
