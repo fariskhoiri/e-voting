@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt2->execute();
                     $stmt2->close();
 
-                    $message = '<div class="success">User "' . htmlspecialchars($username) . '" created successfully!</div>';
+                    $message = '<div class="success">Pengguna "' . htmlspecialchars($username) . '" berhasi didaftarkan!</div>';
                 } else {
                     $message = '<div class="error">Error creating user: ' . $conn->error . '</div>';
                 }
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("i", $user_id);
 
             if ($stmt->execute()) {
-                $message = '<div class="success">User deleted successfully!</div>';
+                $message = '<div class="success">Pengguna berhasil dihapus!</div>';
             } else {
                 $message = '<div class="error">Error deleting user: ' . $conn->error . '</div>';
             }
@@ -220,10 +220,11 @@ $stats = $conn->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users - Admin</title>
+    <title>Kelola Pengguna - Administrator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
@@ -845,6 +846,43 @@ $stats = $conn->query("
             background: #138496;
         }*/
 
+        /* Styling for footer */
+        .simple-footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px 0;
+            border-top: 5px solid #3498db;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .copyright {
+            font-size: 0.9em;
+            color: #bdc3c7;
+        }
+
+        .footer-logo {
+            display: none; 
+        }
+
+        .footer-content::after {
+            display: none;
+        }
+
+        .copyright a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .add-user-form {
@@ -880,7 +918,7 @@ $stats = $conn->query("
         }
 
         function confirmDelete(username) {
-            return confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone!`);
+            return confirm(`Apakah kamu yakin ingin menghapus "${username}"?`);
         }
 
         function exportUsers(format) {
@@ -939,7 +977,7 @@ $stats = $conn->query("
 
             if (form.style.display === 'none') {
                 form.style.display = 'grid';
-                toggleBtn.textContent = 'Hide Form';
+                toggleBtn.textContent = 'Sembunyikan';
             } else {
                 form.style.display = 'none';
                 toggleBtn.textContent = 'Add New User';
@@ -991,19 +1029,17 @@ $stats = $conn->query("
             }
 
             checkSpan.innerHTML = '<span style="color: #28a745;">✓ Valid format</span>';
-
-            // In a real app, you could add AJAX to check availability
         }
     </script>
 </head>
 
 <body>
     <div class="header">
-        <h1 style="margin: 0; color: #333;">User Management</h1>
+        <h1 style="margin: 0; color: #333;">Panel Manajemen Pengguna</h1>
         <div class="nav">
             <a href="dashboard.php">Dashboard</a>
-            <a href="candidates.php">Candidates</a>
-            <a href="users.php" style="color: #dc3545;">Users</a>
+            <a href="candidates.php">Kelola Kandidat</a>
+            <a href="users.php" style="color: #dc3545;">Kelola Pengguna</a>
             <a href="../logout.php">Logout</a>
         </div>
     </div>
@@ -1011,15 +1047,14 @@ $stats = $conn->query("
     <?php echo $message; ?>
 
     <div class="warning">
-        ⚠️ <strong>Important:</strong> As administrator, you can add new users, reset user passwords, manage roles, and control voting status.
-        All password resets are logged for security purposes.
+        <strong>Penting:</strong> Sebagai administrator, kamu dapat menambah pengguna, mereset password, menghapus pengguna, dan mengubah status voting mereka.
     </div>
 
     <!-- Add New User Section -->
     <div class="add-user-section">
         <div class="add-user-header">
-            <div class="add-user-title">Add New User</div>
-            <button class="toggle-add-form" onclick="toggleAddForm()">Add New User</button>
+            <div class="add-user-title">Tambah Pengguna Baru</div>
+            <button class="toggle-add-form" onclick="toggleAddForm()">Klik Disini</button>
         </div>
 
         <form id="addUserForm" method="POST" action="" onsubmit="return validateAddUserForm()" style="display: none;">
@@ -1027,7 +1062,7 @@ $stats = $conn->query("
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" required
-                        placeholder="Enter username"
+                        placeholder="Masukkan username"
                         onkeyup="checkUsername()">
                     <div id="username-check" class="password-hint"></div>
                 </div>
@@ -1035,20 +1070,20 @@ $stats = $conn->query("
                 <div class="form-group">
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" required
-                        placeholder="Enter password">
+                        placeholder="Masukkan password">
                     <!--<div class="password-hint">Minimum 4 characters</div>-->
                 </div>
 
                 <div class="form-group">
-                    <label for="confirm_password">Confirm Password:</label>
+                    <label for="confirm_password">Konfirmasi Password:</label>
                     <input type="password" id="confirm_password" name="confirm_password" required
-                        placeholder="Confirm password">
+                        placeholder="Konfirmasi password">
                 </div>
 
                 <div class="form-group">
                     <label for="role">Role:</label>
                     <select id="role" name="role" required>
-                        <option value="user">Regular User</option>
+                        <option value="user">Pengguna biasa</option>
                         <option value="admin">Administrator</option>
                     </select>
                 </div>
@@ -1056,7 +1091,7 @@ $stats = $conn->query("
                 <div class="form-group">
                     <label>&nbsp;</label>
                     <button type="submit" name="add_user" class="btn-add">
-                        <span style="margin-right: 5px;">+</span> Create User
+                        <span style="margin-right: 5px;">+</span> Tambahkan!
                     </button>
                 </div>
             </div>
@@ -1070,7 +1105,7 @@ $stats = $conn->query("
 
     <div class="stats-cards">
         <div class="stat-card total">
-            <h3>Total Users</h3>
+            <h3>Jumlah Pengguna</h3>
             <div class="number"><?php echo $stats['total_users']; ?></div>
         </div>
         <div class="stat-card admin">
@@ -1078,15 +1113,15 @@ $stats = $conn->query("
             <div class="number"><?php echo $stats['admin_count']; ?></div>
         </div>
         <div class="stat-card users">
-            <h3>Regular Users</h3>
+            <h3>Pengguna Biasa</h3>
             <div class="number"><?php echo $stats['user_count']; ?></div>
         </div>
         <div class="stat-card voted">
-            <h3>Voted</h3>
+            <h3>Sudah Memilih</h3>
             <div class="number"><?php echo $stats['voted_count']; ?></div>
         </div>
         <div class="stat-card not-voted">
-            <h3>Not Voted</h3>
+            <h3>Belum Memilih</h3>
             <div class="number"><?php echo $stats['not_voted_count']; ?></div>
         </div>
     </div>
@@ -1094,31 +1129,31 @@ $stats = $conn->query("
     <div class="filters">
         <form method="GET" class="filter-form">
             <div class="filter-group">
-                <label for="search">Search Username/ID:</label>
+                <label for="search">Cari Usernamae/ID:</label>
                 <input type="text" id="search" name="search" value="<?php echo htmlspecialchars($search); ?>" placeholder="Search users...">
             </div>
 
             <div class="filter-group">
                 <label for="role">Role Filter:</label>
                 <select id="role" name="role">
-                    <option value="">All Roles</option>
+                    <option value="">Semua role</option>
                     <option value="admin" <?php echo $role_filter === 'admin' ? 'selected' : ''; ?>>Administrator</option>
-                    <option value="user" <?php echo $role_filter === 'user' ? 'selected' : ''; ?>>Regular User</option>
+                    <option value="user" <?php echo $role_filter === 'user' ? 'selected' : ''; ?>>Pengguna Biasa</option>
                 </select>
             </div>
 
             <div class="filter-group">
-                <label for="voted">Voting Status:</label>
+                <label for="voted">Status Pemilihan:</label>
                 <select id="voted" name="voted">
-                    <option value="">All Status</option>
-                    <option value="yes" <?php echo $voted_filter === 'yes' ? 'selected' : ''; ?>>Has Voted</option>
-                    <option value="no" <?php echo $voted_filter === 'no' ? 'selected' : ''; ?>>Not Voted</option>
+                    <option value="">Semua Status</option>
+                    <option value="yes" <?php echo $voted_filter === 'yes' ? 'selected' : ''; ?>>Sudah Memilih</option>
+                    <option value="no" <?php echo $voted_filter === 'no' ? 'selected' : ''; ?>>Belum Memilih</option>
                 </select>
             </div>
 
             <div class="filter-actions">
-                <button type="submit" class="btn btn-primary">Apply Filters</button>
-                <a href="users.php" class="btn btn-secondary">Clear Filters</a>
+                <button type="submit" class="btn btn-primary">Terapkan Filter</button>
+                <!--<a href="users.php" class="btn btn-secondary">Bersihkan Filter</a>-->
             </div>
         </form>
     </div>
@@ -1134,11 +1169,11 @@ $stats = $conn->query("
                 <th>ID</th>
                 <th>Username</th>
                 <th>Role</th>
-                <th>Voting Status</th>
-                <th>Total Votes</th>
-                <th>Last Voted</th>
-                <th>Created</th>
-                <th>Actions</th>
+                <th>Status Suara</th>
+                <th>Total Suara</th>
+                <th>Terakhir Memilih</th>
+                <th>Dibuat pada</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -1159,7 +1194,7 @@ $stats = $conn->query("
                         </td>
                         <td>
                             <span class="vote-status voted-<?php echo $user['has_voted'] ? 'yes' : 'no'; ?>">
-                                <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
+                                <?php echo $user['has_voted'] ? 'Sudah Memilih' : 'Belum Memilih'; ?>
                             </span>
                         </td>
                         <td><?php echo $user['total_votes']; ?></td>
@@ -1168,7 +1203,7 @@ $stats = $conn->query("
                             if ($user['last_voted']) {
                                 echo date('M d, Y H:i', strtotime($user['last_voted']));
                             } else {
-                                echo 'Never';
+                                echo 'Tidak pernah';
                             }
                             ?>
                         </td>
@@ -1180,7 +1215,7 @@ $stats = $conn->query("
                                 </button>
 
                                 <button class="btn-small btn-toggle" onclick="openModal('toggleVoteModal', <?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">
-                                    <?php echo $user['has_voted'] ? 'Mark Not Voted' : 'Mark Voted'; ?>
+                                    <?php echo $user['has_voted'] ? 'Belum' : 'Sudah'; ?>
                                 </button>
 
                                 <!--<button class="btn-small btn-role" onclick="openModal('changeRoleModal', <?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">
@@ -1189,7 +1224,7 @@ $stats = $conn->query("
 
                                 <?php if ($user['role'] !== 'admin' || $user['id'] != $_SESSION['user_id']): ?>
                                     <button class="btn-small btn-delete" onclick="openModal('deleteUserModal', <?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">
-                                        Delete
+                                        Hapus
                                     </button>
                                 <?php endif; ?>
                             </div>
@@ -1222,18 +1257,18 @@ $stats = $conn->query("
                 </div>
 
                 <div class="form-group">
-                    <label for="new_password">New Password:</label>
-                    <input type="password" id="new_password" name="new_password" required placeholder="Enter new password">
-                    <small style="color: #666;">Minimum 4 characters</small>
+                    <label for="new_password">Password Baru:</label>
+                    <input type="password" id="new_password" name="new_password" required placeholder="Masukkan password baru">
+                    <small style="color: #666;">Minimal 4 karakter</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="confirm_password">Confirm Password:</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm new password">
+                    <label for="confirm_password">Konfirmasi Password:</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="Konfirmasi password baru">
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('resetPasswordModal')">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('resetPasswordModal')">Batal</button>
                     <button type="submit" name="reset_password" class="btn btn-primary">Reset Password</button>
                 </div>
             </form>
@@ -1244,31 +1279,31 @@ $stats = $conn->query("
     <div id="deleteUserModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Delete User</div>
+                <div class="modal-title">Hapus Pengguna</div>
                 <button class="modal-close" onclick="closeModal('deleteUserModal')">&times;</button>
             </div>
             <form method="POST" action="" onsubmit="return confirmDelete(document.getElementById('delete_username').textContent)">
                 <input type="hidden" id="delete_user_id" name="user_id">
 
                 <div style="padding: 20px; background: #fff3cd; border-radius: 5px; margin-bottom: 20px;">
-                    ⚠️ <strong>Warning:</strong> You are about to delete user: <strong id="delete_username"></strong>
+                    ⚠️ <strong>Peringatan:</strong> Kamu akan menghapus user: <strong id="delete_username"></strong>
                     <br><br>
-                    This action will:
+                    Aksi ini akan:
                     <ul>
-                        <li>Permanently delete the user account</li>
-                        <li>Remove all votes cast by this user</li>
-                        <li>This action cannot be undone!</li>
+                        <li>Secara permanen menghapus akun pengguna</li>
+                        <li>Menghapus semua suara dari pengguna</li>
+                        <li>Aksi ini tidak bisa dibatalkan!</li>
                     </ul>
                 </div>
 
                 <div class="form-group">
-                    <label for="confirm_delete">Type "DELETE" to confirm:</label>
-                    <input type="text" id="confirm_delete" name="confirm_delete" required placeholder="Type DELETE to confirm">
+                    <label for="confirm_delete">Ketik "DELETE" untuk konfirmasi:</label>
+                    <input type="text" id="confirm_delete" name="confirm_delete" required placeholder="Ketik di sini">
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('deleteUserModal')">Cancel</button>
-                    <button type="submit" name="delete_user" class="btn btn-danger" style="background: #dc3545; color: white;">Delete User</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('deleteUserModal')">Batal</button>
+                    <button type="submit" name="delete_user" class="btn btn-danger" style="background: #dc3545; color: white;">Hapus Pengguna</button>
                 </div>
             </form>
         </div>
@@ -1278,7 +1313,7 @@ $stats = $conn->query("
     <div id="toggleVoteModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Toggle Voting Status</div>
+                <div class="modal-title">Ganti Status Suara</div>
                 <button class="modal-close" onclick="closeModal('toggleVoteModal')">&times;</button>
             </div>
             <form method="POST" action="">
@@ -1290,14 +1325,14 @@ $stats = $conn->query("
                 </div>
 
                 <div style="padding: 15px; background: #e7f3ff; border-radius: 5px; margin-bottom: 20px;">
-                    Toggling vote status will change whether this user is marked as having voted or not.
+                    Mengganti status suara pengguna akan mengubah apakah mereka dianggap telah memilih atau belum dalam sistem.
                     <br><br>
-                    <strong>Note:</strong> This does not add or remove actual votes, only changes the status flag.
+                    <strong>Note:</strong> Ini tidak menghapus suara mereka, hanya mengubah status pemilihan mereka.
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('toggleVoteModal')">Cancel</button>
-                    <button type="submit" name="toggle_vote_status" class="btn btn-primary">Toggle Status</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('toggleVoteModal')">Batal</button>
+                    <button type="submit" name="toggle_vote_status" class="btn btn-primary">Ganti Status</button>
                 </div>
             </form>
         </div>
@@ -1343,6 +1378,19 @@ $stats = $conn->query("
             </form>
         </div>
     </div>
+
+    <footer class="simple-footer">
+        <div class="footer-content">
+            <div class="copyright">
+                &copy; <span id="current-year"></span> E-Voting. All Rights Reserved. Made with ❤️ by 
+                <a href="https://github.com/fariskhoiri">Guess Who I am.</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 
 </html>

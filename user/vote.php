@@ -10,7 +10,7 @@ $message = '';
 
 // Check if user has already voted
 if ($_SESSION['has_voted']) {
-    $message = "You have already voted!";
+    $message = "Kamu sudah memilih!";
 }
 
 // Handle vote submission
@@ -198,6 +198,43 @@ $candidates = $conn->query("SELECT * FROM candidates ORDER BY name");
             transform: translateY(-5px);
             transition: transform 0.3s ease;
         }
+
+        /* Styling for footer */
+        .simple-footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px 0;
+            border-top: 5px solid #3498db;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .copyright {
+            font-size: 0.9em;
+            color: #bdc3c7;
+        }
+
+        .footer-logo {
+            display: none; 
+        }
+
+        .footer-content::after {
+            display: none;
+        }
+
+        .copyright a {
+            color: #3498db;
+            text-decoration: none;
+        }
         
         @media (max-width: 768px) {
             .candidate-photo-vote,
@@ -216,7 +253,7 @@ $candidates = $conn->query("SELECT * FROM candidates ORDER BY name");
 
 <body>
     <div class="header">
-        <h1>Cast Your Vote</h1>
+        <h1>Berikan Suaramu</h1>
         <div class="nav">
             <a href="dashboard.php">Dashboard</a>
             <a href="../logout.php">Logout</a>
@@ -230,13 +267,10 @@ $candidates = $conn->query("SELECT * FROM candidates ORDER BY name");
     <?php endif; ?>
     
     <?php if ($_SESSION['has_voted']): ?>
-        <p>You have already cast your vote. Thank you for participating!</p>
-        <a href="dashboard.php">View Results</a>
+        <p>Suaramu telah tersampaikan. Terimakasih sudah berpatisipasi. May the justice be with you, always!</p>
+        <a href="dashboard.php">Lihat Hasil</a>
     <?php else: ?>
-        <h2>Select Your Candidate</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 30px;">
-            Click on a candidate's photo to learn more and vote
-        </p>
+        <h2>Pilih Kandidat Favoritmu</h2>
         
         <form method="POST" action="">
             <div class="candidates">
@@ -247,7 +281,7 @@ $candidates = $conn->query("SELECT * FROM candidates ORDER BY name");
                             <img src="../uploads/candidate_photos/<?php echo htmlspecialchars($candidate['photo_filename']); ?>" 
                                  alt="<?php echo htmlspecialchars($candidate['name']); ?>"
                                  class="candidate-photo-vote"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"150\" height=\"150\" viewBox=\"0 0 150 150\"><circle cx=\"75\" cy=\"75\" r=\"72\" fill=\"%23667eea\"/><text x=\"75\" y=\"85\" font-family=\"Arial\" font-size=\"40\" fill=\"white\" text-anchor=\"middle\">' + '<?php echo strtoupper(substr($candidate['name'], 0, 1)); ?>' + '</text></svg>'">
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"150\" height=\"150\" viewBox=\"0 0 150 150\"><circle cx=\"75\" cy=\"75\" r=\"72\" fill=\"%23667eea\"/></svg>
                         <?php else: ?>
                             <div class="photo-placeholder-vote">
                                 <?php echo strtoupper(substr($candidate['name'], 0, 1)); ?>
@@ -255,17 +289,30 @@ $candidates = $conn->query("SELECT * FROM candidates ORDER BY name");
                         <?php endif; ?>
                         
                         <h3><?php echo htmlspecialchars($candidate['name']); ?></h3>
-                        <p><strong>Party:</strong> <?php echo htmlspecialchars($candidate['party']); ?></p>
+                        <p><strong>Partai:</strong> <?php echo htmlspecialchars($candidate['party']); ?></p>
                         <p><?php echo htmlspecialchars($candidate['description']); ?></p>
                         
                         <button type="submit" name="candidate_id" value="<?php echo $candidate['id']; ?>" class="vote-btn">
-                            ✅ Vote for <?php echo htmlspecialchars($candidate['name']); ?>
+                            Pilih <?php echo htmlspecialchars($candidate['name']); ?>
                         </button>
                     </div>
                 <?php endwhile; ?>
             </div>
         </form>
     <?php endif; ?>
+
+    <footer class="simple-footer">
+        <div class="footer-content">
+            <div class="copyright">
+                &copy; <span id="current-year"></span> E-Voting. All Rights Reserved. Made with ❤️ by 
+                <a href="https://github.com/fariskhoiri">Guess Who I am.</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 
 </html>

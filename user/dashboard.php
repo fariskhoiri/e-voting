@@ -84,6 +84,8 @@ $candidates = $conn->query("
             background: white;
             padding: 30px;
             border-radius: 10px;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -393,6 +395,43 @@ $candidates = $conn->query("
             color: #999;
             margin-top: 5px;
         }
+
+        /* Styling for footer */
+        .simple-footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px 0;
+            border-top: 5px solid #3498db;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .copyright {
+            font-size: 0.9em;
+            color: #bdc3c7;
+        }
+
+        .footer-logo {
+            display: none; 
+        }
+
+        .footer-content::after {
+            display: none;
+        }
+
+        .copyright a {
+            color: #3498db;
+            text-decoration: none;
+        }
         
         @media (max-width: 768px) {
             .candidate-photo-container {
@@ -425,40 +464,40 @@ $candidates = $conn->query("
 
 <body>
 <div class="header">
-        <h1 style="margin: 0; color: #333;">Presidential Election 2025</h1>
+        <h1 style="margin: 0; color: #333;">Pemilihan Presiden 2025</h1>
         <div class="nav">
-            <span style="color: #666; margin-right: 15px;">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+            <span style="color: #666; margin-right: 15px;">Selamat datang, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
             <?php if ($_SESSION['has_voted']): ?>
-                <span class="voted-badge">✓ You Have Voted</span>
+                <span class="voted-badge">Kamu sudah memilih</span>
             <?php else: ?>
-                <span class="not-voted-badge">✗ Not Voted Yet</span>
+                <span class="not-voted-badge">Kamu belum memilih</span>
             <?php endif; ?>
-            <a href="vote.php">Cast Your Vote</a>
+            <a href="vote.php">Berikan Suaramu</a>
             <a href="../logout.php">Logout</a>
         </div>
     </div>
     
     <div class="dashboard-container">
-        <h2 class="page-title">Election Results Live</h2>
+        <h2 class="page-title">Panel Pemilihan</h2>
         
         <?php if ($_SESSION['has_voted']): ?>
             <div class="status-message">
-                ✅ Thank you for participating in the election! Your vote has been recorded.
+                Terima kasih sudah memilih! Suaramu telah tercatat.
             </div>
         <?php else: ?>
             <div class="status-message" style="background: #fff3cd; color: #856404;">
-                ⚠️ You haven't voted yet. <a href="vote.php" style="color: #856404; font-weight: bold;">Click here to vote</a> before the election ends!
+                Kamu masih belum memilih! Lakukan pemilihan sebelum pemilu berakhir.
             </div>
         <?php endif; ?>
         
         <div class="results-summary">
             <div>
-                <h3 style="margin: 0; color: #333;">Live Election Results</h3>
-                <p style="color: #666; margin: 5px 0 0 0;">Real-time updates as votes come in</p>
+                <h3 style="margin: 0; color: #333;">Hasil Pemilihan Langsung</h3>
+                <p style="color: #666; margin: 5px 0 0 0;">Pembaruan dilakukan secara real-time ketika suara masuk</p>
             </div>
             <?php if ($totalVotes > 0): ?>
                 <div class="total-votes">
-                    Total Votes Cast: <?php echo $totalVotes; ?>
+                    Jumlah Suara Diberikan: <?php echo $totalVotes; ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -485,7 +524,7 @@ $candidates = $conn->query("
                         </div>
                         
                         <?php if ($isFirst && $candidate['votes'] > 0): ?>
-                            <div class="leading-badge">🏆 Current Leader</div>
+                            <div class="leading-badge">Unggul Saat Ini</div>
                             <?php $isFirst = false; ?>
                         <?php endif; ?>
                         
@@ -497,11 +536,11 @@ $candidates = $conn->query("
                             
                             <div class="vote-count">
                                 <div class="votes-number"><?php echo $candidate['votes']; ?></div>
-                                <div class="votes-label">votes</div>
+                                <div class="votes-label">suara</div>
                             </div>
                             
                             <div class="percentage-container">
-                                <div class="percentage-text"><?php echo $candidate['percentage']; ?>% of total votes</div>
+                                <div class="percentage-text"><?php echo $candidate['percentage']; ?>% pendapatan suara</div>
                                 <div class="percentage-bar-bg">
                                     <div class="percentage-bar-fill" style="width: <?php echo $candidate['percentage']; ?>%;">
                                         <?php if ($candidate['percentage'] > 15): ?>
@@ -510,13 +549,13 @@ $candidates = $conn->query("
                                     </div>
                                 </div>
                                 <?php if ($candidate['percentage'] <= 15): ?>
-                                    <small style="color: #666;"><?php echo $candidate['percentage']; ?>%</small>
+                                    <!--<small style="color: #666;"><?php //echo $candidate['percentage']; ?>%</small>-->
                                 <?php endif; ?>
                             </div>
                             
                             <?php if (!$_SESSION['has_voted']): ?>
                                 <a href="vote.php">
-                                    <button class="vote-button">Vote for <?php echo htmlspecialchars($candidate['name']); ?></button>
+                                    <button class="vote-button">Berikan suaramu untuk <?php echo htmlspecialchars($candidate['name']); ?></button>
                                 </a>
                             <?php else: ?>
                                 <button class="vote-button" disabled>
@@ -539,16 +578,16 @@ $candidates = $conn->query("
             
             <!-- Statistics section remains the same -->
             <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                <h3 style="color: #333; margin-top: 0;">Election Statistics</h3>
+                <h3 style="color: #333; margin-top: 0;">Statistik Pemilihan</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div style="background: white; padding: 15px; border-radius: 5px;">
-                        <strong>Total Candidates:</strong> <?php echo $candidates->num_rows; ?>
+                        <strong>Jumlah Kandidat:</strong> <?php echo $candidates->num_rows; ?>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 5px;">
-                        <strong>Total Votes:</strong> <?php echo $totalVotes; ?>
+                        <strong>Jumlah Suara Diberikan:</strong> <?php echo $totalVotes; ?>
                     </div>
                     <div style="background: white; padding: 15px; border-radius: 5px;">
-                        <strong>Leading Candidate:</strong> 
+                        <strong>Kandidat Unggul:</strong> 
                         <?php 
                             $candidates->data_seek(0);
                             $leading = $candidates->fetch_assoc();
@@ -569,6 +608,19 @@ $candidates = $conn->query("
             </div>
         <?php endif; ?>
     </div>
+
+    <footer class="simple-footer">
+        <div class="footer-content">
+            <div class="copyright">
+                &copy; <span id="current-year"></span> E-Voting. All Rights Reserved. Made with ❤️ by 
+                <a href="https://github.com/fariskhoiri">Guess Who I am.</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 
 </html>

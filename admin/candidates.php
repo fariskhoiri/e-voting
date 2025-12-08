@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if we already have 3 candidates
         $count = countCandidates();
         if ($count >= 3) {
-            $message = '<div class="error">Maximum of 3 candidates allowed!</div>';
+            $message = '<div class="error">Maksimal 3 kandidat!</div>';
         } else {
             // Handle file upload
             $photo_filename = null;
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $conn->prepare("INSERT INTO candidates (name, party, description, photo_filename, photo_mime_type, photo_size, photo_uploaded_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
                 $stmt->bind_param("sssssi", $name, $party, $description, $photo_filename, $photo_mime_type, $photo_size);
                 if ($stmt->execute()) {
-                    $message = '<div class="success">Candidate added successfully!</div>';
+                    $message = '<div class="success">Kandidat berhasil ditambahkan!</div>';
                 } else {
                     $message = '<div class="error">Error adding candidate: ' . $conn->error . '</div>';
                 }
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $stmt->close();
-        $message = '<div class="success">Candidate deleted!</div>';
+        $message = '<div class="success">Kandidat dihapus!</div>';
     } elseif (isset($_POST['update_photo'])) {
         $id = $_POST['id'];
         $photo_file = $_FILES['photo'] ?? null;
@@ -396,6 +396,43 @@ $candidates = $conn->query("
             object-fit: cover;
             margin-bottom: 10px;
         }
+
+        /* Styling for Footer */
+        .simple-footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px 0;
+            border-top: 5px solid #3498db;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .copyright {
+            font-size: 0.9em;
+            color: #bdc3c7;
+        }
+
+        .footer-logo {
+            display: none; 
+        }
+
+        .footer-content::after {
+            display: none;
+        }
+
+        .copyright a {
+            color: #3498db; /* Warna tautan biru */
+            text-decoration: none;
+        }
         
         @media (max-width: 768px) {
             .candidate-header {
@@ -482,11 +519,11 @@ $candidates = $conn->query("
 
 <body>
 <div class="header">
-        <h1 style="margin: 0; color: #333;">Manage Candidates</h1>
+        <h1 style="margin: 0; color: #333;">Panel Kelola Kandidat</h1>
         <div class="nav">
             <a href="dashboard.php">Dashboard</a>
-            <a href="candidates.php" style="color: #dc3545;">Candidates</a>
-            <a href="users.php">Users</a>
+            <a href="candidates.php" style="color: #dc3545;">Kelola Kandidat</a>
+            <a href="users.php">Kelola Pengguna</a>
             <a href="../logout.php">Logout</a>
         </div>
     </div>
@@ -496,27 +533,25 @@ $candidates = $conn->query("
     <?php endif; ?>
     
     <div class="upload-instructions">
-        <h3 style="margin-top: 0; color: #0056b3;">📸 Photo Upload Guidelines:</h3>
+        <h3 style="margin-top: 0; color: #0056b3;">Panduan Upload Foto:</h3>
         <ul style="margin-bottom: 0;">
-            <li>Supported formats: JPG, PNG, GIF, WebP</li>
-            <li>Maximum file size: 2MB</li>
-            <li>Recommended: Square photo (1:1 ratio) for best display</li>
-            <li>Photo will be cropped to circle on display</li>
+            <li>Format yang didukung: JPG, PNG, GIF, WebP</li>
+            <li>Ukuran maksimum file: 2MB</li>
+            <li>Rekomendasi: Foto persegi (rasio 1:1) untuk tampilan yang lebih baik</li>
+            <li>Foto akan di potong lingkaran saat ditampilkan</li>
         </ul>
     </div>
     
-    <h2>Add New Candidate</h2>
+    <h2>Tambahkan Kandidat Baru</h2>
     <form method="POST" action="" enctype="multipart/form-data" onsubmit="return validatePhotoUpload()">
         <div class="photo-upload-section">
-            <h3 style="margin-top: 0;">Candidate Photo</h3>
+            <h3 style="margin-top: 0;">Foto Kandidat</h3>
             
-            <div id="photo-preview" class="photo-placeholder">
-                Click to select photo
-            </div>
+            <div id="photo-preview" class="photo-placeholder"></div>
             
             <div class="file-input-container">
                 <label class="file-input-label">
-                    📁 Choose Photo
+                    Pilih Foto
                     <input type="file" id="photo" name="photo" class="file-input" 
                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                            onchange="previewPhoto(this, 'photo-preview')">
@@ -524,27 +559,27 @@ $candidates = $conn->query("
             </div>
             
             <div id="file-info" class="file-info">
-                No file selected
+                Tidak ada file yang dipilih
             </div>
         </div>
         
         <div class="form-group">
-            <label>Full Name:</label>
+            <label>Nama Lengkap:</label>
             <input type="text" name="name" required>
         </div>
         <div class="form-group">
-            <label>Political Party:</label>
+            <label>Partai Politik:</label>
             <input type="text" name="party" required>
         </div>
         <div class="form-group">
-            <label>Description:</label>
+            <label>Visi dan Misi Singkat:</label>
             <textarea name="description" rows="3" required></textarea>
         </div>
-        <button type="submit" name="add">Add Candidate</button>
+        <button type="submit" name="add">Tambahkan Kandidat</button>
     </form>
     
     <div class="candidate-list">
-        <h2>Current Candidates (<?php echo $candidates->num_rows; ?>/3)</h2>
+        <h2>Kandidat Saat Ini (<?php echo $candidates->num_rows; ?>/3)</h2>
         
         <?php while ($candidate = $candidates->fetch_assoc()): ?>
             <div class="candidate">
@@ -563,7 +598,7 @@ $candidates = $conn->query("
                     <div style="flex: 1;">
                         <h3 style="margin: 0 0 5px 0;"><?php echo htmlspecialchars($candidate['name']); ?></h3>
                         <p style="margin: 0 0 10px 0; color: #666;">
-                            <strong>Party:</strong> <?php echo htmlspecialchars($candidate['party']); ?>
+                            <strong>Partai:</strong> <?php echo htmlspecialchars($candidate['party']); ?>
                         </p>
                         <p style="margin: 0;">
                             <span class="photo-status <?php echo $candidate['photo_filename'] ? 'photo-uploaded' : 'photo-none'; ?>">
@@ -573,12 +608,12 @@ $candidates = $conn->query("
                     </div>
                 </div>
                 
-                <p><strong>Description:</strong> <?php echo htmlspecialchars($candidate['description']); ?></p>
-                <p><strong>Votes:</strong> <?php echo $candidate['votes']; ?></p>
+                <p><strong>Visi & Misi Singkat:</strong> <?php echo htmlspecialchars($candidate['description']); ?></p>
+                <p><strong>Suara:</strong> <?php echo $candidate['votes']; ?></p>
                 
                 <?php if ($candidate['photo_filename'] && $candidate['photo_uploaded_at']): ?>
                     <p style="font-size: 0.9rem; color: #666;">
-                        <strong>Photo uploaded:</strong> 
+                        <strong>Foto diupload pada:</strong> 
                         <?php echo date('M d, Y H:i', strtotime($candidate['photo_uploaded_at'])); ?>
                         (<?php echo round($candidate['photo_size'] / 1024, 2); ?> KB)
                     </p>
@@ -587,20 +622,20 @@ $candidates = $conn->query("
                 <div class="photo-actions">
                     <!--<button type="button" class="btn-photo btn-photo-upload" 
                             onclick="openPhotoModal(<?php echo $candidate['id']; ?>, '<?php echo htmlspecialchars($candidate['name']); ?>')">
-                        📤 Update Photo
+                        Update Photo
                     </button>-->
                     
                     <!--<?php if ($candidate['photo_filename']): ?>
                         <button type="button" class="btn-photo btn-photo-remove" 
                                 onclick="removePhoto(<?php echo $candidate['id']; ?>)">
-                            🗑️ Remove Photo
+                            Remove Photo
                         </button>
                     <?php endif; ?>-->
                 </div>
                 
                 <form method="POST" action="" style="margin-top: 10px;">
                     <input type="hidden" name="id" value="<?php echo $candidate['id']; ?>">
-                    <button type="submit" name="delete" onclick="return confirm('Delete this candidate?')">Delete Candidate</button>
+                    <div class="delete-btn"><button type="submit" name="delete" onclick="return confirm('Yakin hapus kandidat?')">Hapus Kandidat</button></div>
                 </form>
             </div>
         <?php endwhile; ?>
@@ -630,7 +665,7 @@ $candidates = $conn->query("
                     
                     <div class="file-input-container">
                         <label class="file-input-label">
-                            📁 Choose Photo
+                            Choose Photo
                             <input type="file" id="update_photo" name="photo" class="file-input" 
                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                                    onchange="previewPhoto(this, 'update-photo-preview')">
@@ -681,6 +716,19 @@ $candidates = $conn->query("
             <?php endwhile; ?>
         </div>
     <?php endif; ?>-->
+
+    <footer class="simple-footer">
+        <div class="footer-content">
+            <div class="copyright">
+                &copy; <span id="current-year"></span> E-Voting. All Rights Reserved. Made with ❤️ by 
+                <a href="https://github.com/fariskhoiri">Guess Who I am.</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 
 </html>

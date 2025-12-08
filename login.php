@@ -226,11 +226,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="">
             <div class="form-group">
                 <label>Username:</label>
-                <input type="text" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" required placeholder="Masukkan username Anda">
+                <input type="text" name="username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" required placeholder="Masukkan username kamu disini">
             </div>
             <div class="form-group">
                 <label>Password:</label>
-                <input type="password" name="password" required placeholder="Masukkan password Anda">
+                <input type="password" name="password" required placeholder="Masukkan password kamu disini">
             </div>
             <button type="submit">Login</button>
         </form>

@@ -176,7 +176,7 @@ if (isLoggedIn()) {
         </div> -->
 
         <h1>Pemilihan Presiden</h1>
-        <p>Selamat datang di platform pemilihan presiden digital. Silakan masuk untuk memberikan suara Anda.</p>
+        <p>Selamat datang di platform pemilihan presiden digital. Silakan login untuk memberikan suara kamu atau register untuk menjadi pemberi suara.</p>
 
         <div class="nav">
             <a href="login.php" class="btn btn-primary">

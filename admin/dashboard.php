@@ -104,6 +104,8 @@ $candidates = $conn->query("
             background: white;
             padding: 25px;
             border-radius: 10px;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -191,6 +193,43 @@ $candidates = $conn->query("
             background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
+        }
+
+        /* Styling for Footer */
+        .simple-footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 25px 0;
+            border-top: 5px solid #3498db;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .copyright {
+            font-size: 0.9em;
+            color: #bdc3c7;
+        }
+
+        .footer-logo {
+            display: none; 
+        }
+
+        .footer-content::after {
+            display: none;
+        }
+
+        .copyright a {
+            color: #3498db; /* Warna tautan biru */
+            text-decoration: none;
         }
     </style>
 </head>
@@ -318,6 +357,19 @@ $candidates = $conn->query("
             </div>
         <?php endif; ?>
     </div>
+
+    <footer class="simple-footer">
+        <div class="footer-content">
+            <div class="copyright">
+                &copy; <span id="current-year"></span> E-Voting. All Rights Reserved. Made with ❤️ by 
+                <a href="https://github.com/fariskhoiri">Guess Who I am.</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 
 </html>
