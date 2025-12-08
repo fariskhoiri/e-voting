@@ -39,7 +39,7 @@ Pastikan gunakan php versi 8.x.x keatas
 - Akses aplikasi melalui:
 
 ```bash
-  http://localhost/e_voting/index.php
+  http://localhost/e-voting-main/index.php
 ```
 
 Login (Administrtor):
