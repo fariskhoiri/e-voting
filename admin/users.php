@@ -38,8 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Username sudah digunakan!';
                 $msg_type = 'error';
             } else {
+                // Hash kata sandi sebelum disimpan
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
-                $stmt->bind_param("sss", $username, $password, $role);
+                $stmt->bind_param("sss", $username, $hashed_password, $role);
                 if ($stmt->execute()) {
                     // Log creation
                     $new_id = $stmt->insert_id;
@@ -67,8 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = 'Password tidak valid atau tidak cocok!';
             $msg_type = 'error';
         } else {
+            // Hash kata sandi baru sebelum disimpan
+            $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
-            $stmt->bind_param("si", $new_password, $user_id);
+            $stmt->bind_param("si", $hashed_password, $user_id);
             if ($stmt->execute()) {
                 $admin_id = $_SESSION['user_id'];
                 $conn->query("INSERT INTO password_reset_logs (admin_id, user_id, reset_at) VALUES ($admin_id, $user_id, NOW())");

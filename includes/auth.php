@@ -14,7 +14,7 @@ function login($username, $password)
         $user = $result->fetch_assoc();
 
         // Compare plaintext passwords (EDUCATIONAL ONLY)
-        if ($password === $user['password']) {
+        if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
@@ -48,9 +48,11 @@ function registerUser($username, $password, $role = 'user')
     }
     $checkStmt->close();
 
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
     // Insert new user
     $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $username, $password, $role);
+    $stmt->bind_param("sss", $username, $hashed_password, $role);
 
     $success = $stmt->execute();
 
