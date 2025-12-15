@@ -55,264 +55,161 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$_SESSION['has_voted']) {
 $candidates = $conn->query("SELECT * FROM candidates ORDER BY name");
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cast Your Vote</title>
+    <title>Bilik Suara Digital</title>
+
+    <?php require_once '../includes/head_styles.php'; ?>
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+        /* Style Tambahan Khusus Halaman Vote */
+        .vote-card {
+            text-align: center;
+            padding-top: 0;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+        .vote-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .nav a {
-            margin-right: 15px;
-            text-decoration: none;
-            color: #007bff;
+        /* Highlight border saat dipilih (opsional, bisa via JS) */
+        .vote-card.selected {
+            border: 2px solid var(--primary);
+            background: #f0f9ff;
         }
 
-        .message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .candidates {
-            display: grid;
-            gap: 15px;
-        }
-
-        .candidate {
+        .candidate-img-large {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: -70px auto 20px auto;
+            position: relative;
+            z-index: 10;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .vote-btn {
-            background: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        .candidate-header-bg {
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
+            margin: -24px -24px 0 -24px;
+            /* Menutupi padding card */
         }
 
-        .vote-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .candidate {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .success-banner {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 30px;
+            border-radius: 16px;
             text-align: center;
-            padding: 30px 20px;
-        }
-        
-        .candidate-photo-vote {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #667eea;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .photo-placeholder-vote {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            border: 3px solid #dee2e6;
-        }
-        
-        .candidate h3 {
-            margin: 0 0 10px 0;
-            color: #333;
-            font-size: 1.4rem;
-        }
-        
-        .candidate p {
-            margin: 0 0 15px 0;
-            color: #666;
-        }
-        
-        .vote-btn {
-            background: linear-gradient(90deg, #28a745, #20c997);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            width: 80%;
-            max-width: 200px;
-        }
-        
-        .vote-btn:hover:not(:disabled) {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-        }
-        
-        .candidates {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .candidate:hover {
-            transform: translateY(-5px);
-            transition: transform 0.3s ease;
-        }
-
-        /* Styling for footer */
-        .simple-footer {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 25px 0;
-            border-top: 5px solid #3498db;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        
-        .copyright {
-            font-size: 0.9em;
-            color: #bdc3c7;
-        }
-
-        .footer-logo {
-            display: none; 
-        }
-
-        .footer-content::after {
-            display: none;
-        }
-
-        .copyright a {
-            color: #3498db;
-            text-decoration: none;
-        }
-        
-        @media (max-width: 768px) {
-            .candidate-photo-vote,
-            .photo-placeholder-vote {
-                width: 120px;
-                height: 120px;
-            }
-            
-            .candidates {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
+            margin-bottom: 30px;
+            border: 1px solid #a7f3d0;
         }
     </style>
 </head>
 
 <body>
-    <div class="header">
-        <h1>Berikan Suaramu</h1>
-        <div class="nav">
-            <a href="dashboard.php">Dashboard</a>
-            <a href="../logout.php">Logout</a>
+
+    <nav class="navbar">
+        <a href="dashboard.php" class="brand">
+            <i class="fas fa-vote-yea"></i> Bilik Suara
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.php"><i class="fas fa-chevron-left"></i> Kembali ke Dashboard</a>
+            <a href="../logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="page-header" style="text-align: center; border: none; margin-bottom: 40px;">
+            <?php if (!$_SESSION['has_voted']): ?>
+                <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Tentukan Pilihanmu</h1>
+                <p class="text-gray" style="font-size: 1.1rem;">
+                    Silakan pilih satu kandidat di bawah ini. Pilihan Anda bersifat rahasia dan tidak dapat diubah setelah dikirim.
+                </p>
+            <?php else: ?>
+                <div class="success-banner">
+                    <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 15px;"></i>
+                    <h2 style="margin: 0 0 10px 0;">Terima Kasih Telah Berpartisipasi!</h2>
+                    <p style="font-size: 1.1rem;">Suara Anda telah berhasil direkam. "May the justice be with you, always!"</p>
+                    <div style="margin-top: 20px;">
+                        <a href="dashboard.php" class="btn btn-primary">
+                            <i class="fas fa-chart-bar"></i> Lihat Hasil Sementara
+                        </a>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($message): ?>
+            <div style="padding: 15px; margin-bottom: 30px; text-align: center; border-radius: 8px; font-weight: bold;
+                 background: <?php echo strpos($message, 'successfully') !== false ? '#d1fae5' : '#fee2e2'; ?>; 
+                 color: <?php echo strpos($message, 'successfully') !== false ? '#065f46' : '#991b1b'; ?>;">
+                <?php echo $message; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!$_SESSION['has_voted']): ?>
+            <form method="POST" action="" id="voteForm">
+                <div class="grid-3">
+                    <?php while ($candidate = $candidates->fetch_assoc()): ?>
+                        <div class="card vote-card">
+
+                            <div class="candidate-header-bg"></div>
+
+                            <div class="candidate-img-large">
+                                <?php if ($candidate['photo_filename']): ?>
+                                    <img src="../uploads/candidate_photos/<?php echo htmlspecialchars($candidate['photo_filename']); ?>"
+                                        alt="<?php echo htmlspecialchars($candidate['name']); ?>"
+                                        style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;"
+                                        onerror="this.src='https://via.placeholder.com/140?text=<?php echo substr($candidate['name'], 0, 1); ?>'">
+                                <?php else: ?>
+                                    <div style="width: 100%; height: 100%; background: var(--light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; border-radius: 50%;">
+                                        <?php echo strtoupper(substr($candidate['name'], 0, 1)); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <h3 style="margin-bottom: 5px; color: var(--dark);"><?php echo htmlspecialchars($candidate['name']); ?></h3>
+                            <div style="margin-bottom: 15px;">
+                                <span class="badge badge-admin" style="font-size: 0.9rem;"><?php echo htmlspecialchars($candidate['party']); ?></span>
+                            </div>
+
+                            <p style="color: #666; font-size: 0.95rem; line-height: 1.5; margin-bottom: 25px; min-height: 60px;">
+                                <?php echo htmlspecialchars($candidate['description']); ?>
+                            </p>
+
+                            <button type="submit" name="candidate_id" value="<?php echo $candidate['id']; ?>"
+                                class="btn btn-primary" style="width: 100%; border-radius: 50px; padding: 12px;"
+                                onclick="return confirm('Apakah Anda yakin ingin memilih <?php echo htmlspecialchars($candidate['name']); ?>? Pilihan tidak dapat diubah.');">
+                                <i class="fas fa-check"></i> Pilih Kandidat Ini
+                            </button>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+            </form>
+        <?php endif; ?>
+
     </div>
 
-    <?php if ($message): ?>
-        <div class="message <?php echo strpos($message, 'successfully') !== false ? 'success' : 'error'; ?>">
-            <?php echo $message; ?>
+    <div class="main-footer">
+        <div class="copyright">
+            &copy; <span id="current-year"></span> E-Voting System. Hak Cipta Dilindungi.
         </div>
-    <?php endif; ?>
-    
-    <?php if ($_SESSION['has_voted']): ?>
-        <p>Suaramu telah tersampaikan. Terimakasih sudah berpatisipasi. May the justice be with you, always!</p>
-        <a href="dashboard.php">Lihat Hasil</a>
-    <?php else: ?>
-        <h2>Pilih Kandidat Favoritmu</h2>
-        
-        <form method="POST" action="">
-            <div class="candidates">
-                <?php while ($candidate = $candidates->fetch_assoc()): ?>
-                    <div class="candidate">
-                        <!-- Candidate Photo -->
-                        <?php if ($candidate['photo_filename']): ?>
-                            <img src="../uploads/candidate_photos/<?php echo htmlspecialchars($candidate['photo_filename']); ?>" 
-                                 alt="<?php echo htmlspecialchars($candidate['name']); ?>"
-                                 class="candidate-photo-vote"
-                                 onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"150\" height=\"150\" viewBox=\"0 0 150 150\"><circle cx=\"75\" cy=\"75\" r=\"72\" fill=\"%23667eea\"/></svg>
-                        <?php else: ?>
-                            <div class="photo-placeholder-vote">
-                                <?php echo strtoupper(substr($candidate['name'], 0, 1)); ?>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <h3><?php echo htmlspecialchars($candidate['name']); ?></h3>
-                        <p><strong>Partai:</strong> <?php echo htmlspecialchars($candidate['party']); ?></p>
-                        <p><?php echo htmlspecialchars($candidate['description']); ?></p>
-                        
-                        <button type="submit" name="candidate_id" value="<?php echo $candidate['id']; ?>" class="vote-btn">
-                            Pilih <?php echo htmlspecialchars($candidate['name']); ?>
-                        </button>
-                    </div>
-                <?php endwhile; ?>
-            </div>
-        </form>
-    <?php endif; ?>
-
-    <footer class="simple-footer">
-        <div class="footer-content">
-            <div class="copyright">
-                &copy; <span id="current-year"></span> E-Voting. All Rights Reserved. Made with ❤️ by 
-                <a href="https://github.com/fariskhoiri">Guess Who I am.</a>
-            </div>
-        </div>
-    </footer>
-
+    </div>
     <script>
         document.getElementById('current-year').textContent = new Date().getFullYear();
     </script>
+
 </body>
 
 </html>

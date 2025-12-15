@@ -24,348 +24,183 @@ $candidates = $conn->query("
 ");
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav a {
-            margin-right: 15px;
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        .nav a:hover {
-            text-decoration: underline;
-        }
-
-        .dashboard-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            color: #333;
-            margin-top: 0;
-            font-size: 1.2rem;
-        }
-
-        .card p {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #007bff;
-            margin: 10px 0;
-        }
-
-        .card small {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .results-section {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            border-bottom-left-radius: 0px;
-            border-bottom-right-radius: 0px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .results-table th {
-            background: #007bff;
-            color: white;
-            padding: 15px;
-            text-align: left;
-        }
-
-        .results-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .results-table tr:hover {
-            background: #f9f9f9;
-        }
-
-        .percentage-bar-container {
-            width: 100%;
-            background: #e9ecef;
-            border-radius: 20px;
-            height: 20px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-
-        .percentage-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #007bff, #0056b3);
-            border-radius: 20px;
-            text-align: center;
-            color: white;
-            font-size: 0.8rem;
-            line-height: 20px;
-            transition: width 0.5s ease;
-        }
-
-        .percentage-text {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .candidate-name {
-            font-weight: bold;
-            color: #333;
-        }
-
-        .party-name {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .total-votes {
-            background: #28a745;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        .no-candidates {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-style: italic;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        /* Styling for Footer */
-        .simple-footer {
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 25px 0;
-            border-top: 5px solid #3498db;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        
-        .copyright {
-            font-size: 0.9em;
-            color: #bdc3c7;
-        }
-
-        .footer-logo {
-            display: none; 
-        }
-
-        .footer-content::after {
-            display: none;
-        }
-
-        .copyright a {
-            color: #3498db; /* Warna tautan biru */
-            text-decoration: none;
-        }
-    </style>
+    <?php require_once '../includes/head_styles.php'; ?>
 </head>
 
 <body>
-    <div class="header">
-        <h1 style="margin: 0; color: #333;">Admin Dashboard</h1>
-        <div class="nav">
-            <span style="color: #666; margin-right: 15px;">Selamat datang, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
-            <a href="candidates.php">Kelola Kandidat</a>
-            <a href="users.php">Kelola Pengguna</a>
-            <a href="../logout.php">Logout</a>
-        </div>
-    </div>
 
-    <div class="dashboard-cards">
-        <div class="card">
-            <h3>Jumlah Kandidat</h3>
-            <p><?php
-                $result = $conn->query("SELECT COUNT(*) as count FROM candidates");
-                $row = $result->fetch_assoc();
-                echo $row['count'];
-                ?></p>
-            <small>Maks 3 kandidat</small>
+    <nav class="navbar">
+        <a href="dashboard.php" class="brand">
+            <i class="fas fa-vote-yea"></i> Admin Panel
+        </a>
+        <div class="nav-links">
+            <a href="dashboard.php" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="candidates.php"><i class="fas fa-users"></i> Kandidat</a>
+            <a href="users.php"><i class="fas fa-user-cog"></i> Pengguna</a>
+            <a href="../logout.php" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
+    </nav>
 
-        <div class="card">
-            <h3>Pemilih Suara</h3>
-            <p><?php
-                $result = $conn->query("SELECT COUNT(*) as count FROM users WHERE role='user'");
-                $row = $result->fetch_assoc();
-                echo $row['count'];
-                ?></p>
-            <small>Pemilih suara terdaftar</small>
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Dashboard Overview</h1>
+            <p class="text-gray">Selamat datang, <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>!</p>
         </div>
 
-        <div class="card">
-            <h3>Total Suara Diberikan</h3>
-            <p><?php
-                $result = $conn->query("SELECT COUNT(*) as count FROM votes");
-                $row = $result->fetch_assoc();
-                echo $row['count'];
-                ?></p>
-            <small>Suara telah diberikan</small>
-        </div>
-    </div>
-
-    <div class="results-section">
-        <h2 style="margin-top: 0; color: #333;">Hasil Pemungutan Suara</h2>
-
-        <?php if ($totalVotes > 0): ?>
-            <div class="total-votes">
-                Total Pemungutan: <?php echo $totalVotes; ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($candidates->num_rows > 0): ?>
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th>Kandidat</th>
-                        <th>Partai</th>
-                        <th>Suara</th>
-                        <th>Persentase</th>
-                        <th>Progress</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($candidate = $candidates->fetch_assoc()): ?>
-                        <tr>
-                            <td>
-                                <div class="candidate-name"><?php echo htmlspecialchars($candidate['name']); ?></div>
-                            </td>
-                            <td>
-                                <div class="party-name"><?php echo htmlspecialchars($candidate['party']); ?></div>
-                            </td>
-                            <td>
-                                <strong><?php echo $candidate['votes']; ?></strong>
-                            </td>
-                            <td>
-                                <div class="percentage-text"><?php echo $candidate['percentage']; ?>%</div>
-                            </td>
-                            <td style="width: 200px;">
-                                <div class="percentage-bar-container">
-                                    <div class="percentage-bar" style="width: <?php echo $candidate['percentage']; ?>%;">
-                                        <?php if ($candidate['percentage'] > 10): ?>
-                                            <?php echo $candidate['percentage']; ?>%
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <?php if ($candidate['percentage'] <= 10): ?>
-                                    <small><?php echo $candidate['percentage']; ?>%</small>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
-
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <strong>Kandidat Teratas:</strong><br>
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-user-tie"></i></div>
+                <div class="card-title">Jumlah Kandidat</div>
+                <div class="card-number">
                     <?php
-                    $candidates->data_seek(0);
-                    $leading = $candidates->fetch_assoc();
-                    if ($leading) {
-                        echo htmlspecialchars($leading['name']) . " (" . $leading['percentage'] . "%)";
-                    }
+                    $result = $conn->query("SELECT COUNT(*) as count FROM candidates");
+                    $row = $result->fetch_assoc();
+                    echo $row['count'];
                     ?>
                 </div>
-                <div class="stat-item">
-                    <strong>Partisipasi Pemilih:</strong><br>
+                <small class="text-gray">Maksimal 3 kandidat</small>
+            </div>
+
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-users"></i></div>
+                <div class="card-title">Pemilih Terdaftar</div>
+                <div class="card-number">
                     <?php
-                    $totalUsers = $conn->query("SELECT COUNT(*) as count FROM users WHERE role='user'")->fetch_assoc()['count'];
-                    $votedUsers = $conn->query("SELECT COUNT(*) as count FROM users WHERE has_voted = TRUE AND role='user'")->fetch_assoc()['count'];
-                    $turnout = $totalUsers > 0 ? round(($votedUsers / $totalUsers) * 100, 2) : 0;
-                    echo $turnout . "% ($votedUsers/$totalUsers users)";
+                    $result = $conn->query("SELECT COUNT(*) as count FROM users WHERE role='user'");
+                    $row = $result->fetch_assoc();
+                    echo $row['count'];
                     ?>
                 </div>
+                <small class="text-gray">User aktif</small>
             </div>
-        <?php else: ?>
-            <div class="no-candidates">
-                <p>No candidates registered yet. Add candidates to start the election.</p>
-                <a href="candidates.php" style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">Add Candidates</a>
-            </div>
-        <?php endif; ?>
-    </div>
 
-    <footer class="simple-footer">
-        <div class="footer-content">
-            <div class="copyright">
-                &copy; <span id="current-year"></span> E-Voting. All Rights Reserved. Made with ❤️ by 
-                <a href="https://github.com/fariskhoiri">Guess Who I am.</a>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-box-open"></i></div>
+                <div class="card-title">Total Suara Masuk</div>
+                <div class="card-number">
+                    <?php
+                    $result = $conn->query("SELECT COUNT(*) as count FROM votes");
+                    $row = $result->fetch_assoc();
+                    echo $row['count'];
+                    ?>
+                </div>
+                <small style="color: var(--primary);">Data Real-time</small>
             </div>
         </div>
-    </footer>
+
+        <div class="card" style="margin-top: 30px; padding: 0; border: none; overflow: hidden;">
+            <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;"><i class="fas fa-poll"></i> Hasil Pemungutan Suara</h3>
+                <?php if ($totalVotes > 0): ?>
+                    <span class="badge badge-success">Total: <?php echo $totalVotes; ?> Suara</span>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($candidates->num_rows > 0): ?>
+                <div class="table-container" style="margin-top: 0; box-shadow: none; border-radius: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kandidat</th>
+                                <th width="40%">Progress Suara</th>
+                                <th>Total</th>
+                                <th>Persentase</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // Mengambil statistik partisipasi untuk ditampilkan di bawah
+                            $totalUsers = $conn->query("SELECT COUNT(*) as count FROM users WHERE role='user'")->fetch_assoc()['count'];
+                            $votedUsers = $conn->query("SELECT COUNT(*) as count FROM users WHERE has_voted = TRUE AND role='user'")->fetch_assoc()['count'];
+
+                            while ($candidate = $candidates->fetch_assoc()):
+                            ?>
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 15px;">
+                                            <?php if ($candidate['photo_filename']): ?>
+                                                <img src="../uploads/candidate_photos/<?php echo htmlspecialchars($candidate['photo_filename']); ?>"
+                                                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb;">
+                                            <?php else: ?>
+                                                <div style="width: 40px; height: 40px; background: #e0e7ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                                    <?php echo strtoupper(substr($candidate['name'], 0, 1)); ?>
+                                                </div>
+                                            <?php endif; ?>
+
+                                            <div>
+                                                <div style="font-weight: bold; color: var(--dark);"><?php echo htmlspecialchars($candidate['name']); ?></div>
+                                                <div style="font-size: 0.8rem; color: var(--gray);"><?php echo htmlspecialchars($candidate['party']); ?></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="width: 100%; background: #eef2ff; height: 10px; border-radius: 10px; overflow: hidden;">
+                                            <div style="height: 100%; background: var(--primary); border-radius: 10px; width: <?php echo $candidate['percentage']; ?>%;"></div>
+                                        </div>
+                                    </td>
+                                    <td style="font-weight: bold; font-size: 1.1rem;"><?php echo $candidate['votes']; ?></td>
+                                    <td>
+                                        <span class="badge badge-admin"><?php echo $candidate['percentage']; ?>%</span>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="padding: 20px; background: #f9fafb; border-top: 1px solid #eee;">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="flex: 1; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <strong style="display: block; color: var(--gray); font-size: 0.8rem; text-transform: uppercase;">Kandidat Unggul</strong>
+                            <?php
+                            $candidates->data_seek(0);
+                            $leading = $candidates->fetch_assoc();
+                            if ($leading && $leading['votes'] > 0) {
+                                echo "<span style='color: var(--primary); font-weight: bold; font-size: 1.1rem;'>" . htmlspecialchars($leading['name']) . "</span> (" . $leading['percentage'] . "%)";
+                            } else {
+                                echo "-";
+                            }
+                            ?>
+                        </div>
+                        <div style="flex: 1; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                            <strong style="display: block; color: var(--gray); font-size: 0.8rem; text-transform: uppercase;">Partisipasi Pemilih</strong>
+                            <?php
+                            $turnout = $totalUsers > 0 ? round(($votedUsers / $totalUsers) * 100, 2) : 0;
+                            echo "<span style='font-weight: bold; font-size: 1.1rem;'>" . $turnout . "%</span> <span style='color: #666; font-size: 0.9rem;'>($votedUsers dari $totalUsers user)</span>";
+                            ?>
+                        </div>
+                    </div>
+                </div>
+
+            <?php else: ?>
+                <div style="text-align: center; padding: 50px;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; color: #d1d5db; margin-bottom: 15px;"></i>
+                    <p style="color: #666;">Belum ada kandidat yang terdaftar.</p>
+                    <a href="candidates.php" class="btn btn-primary" style="margin-top: 10px;">
+                        <i class="fas fa-plus"></i> Tambah Kandidat
+                    </a>
+                </div>
+            <?php endif; ?>
+        </div>
+
+    </div>
+
+    <div class="main-footer">
+        <div class="copyright">
+            &copy; <span id="current-year"></span> E-Voting System. All Rights Reserved.
+        </div>
+        <div class="credits">
+            Created with ❤️ by <a href="https://github.com/fariskhoiri" target="_blank" style="color: var(--primary); text-decoration: none;">Guess Who I am</a>.
+        </div>
+    </div>
 
     <script>
         document.getElementById('current-year').textContent = new Date().getFullYear();

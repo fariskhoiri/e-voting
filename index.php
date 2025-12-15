@@ -11,182 +11,167 @@ if (isLoggedIn()) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presidential Election System</title>
+    <title>Selamat Datang - E-Voting System</title>
 
-    <!-- Mengambil Font Modern dari Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Mengambil Icon Library (FontAwesome) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+    <link rel="stylesheet" href="assets/css/style.css">
+
     <style>
-        :root {
-            --primary-color: #0d47a1;
-            /* Biru Tua Resmi */
-            --primary-hover: #1565c0;
-            --secondary-color: #e0e0e0;
-            --text-color: #333;
-            --bg-gradient-start: #ECE9E6;
-            --bg-gradient-end: #FFFFFF;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* Override Style Khusus Halaman Landing */
         body {
-            font-family: 'Poppins', sans-serif;
-            background: url('indo-anniversary.png');
+            /* Background Gradient Modern */
+            /*background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);*/
+
+            /* JIKA INGIN TETAP PAKAI GAMBAR BACKGROUND, UN-COMMENT BARIS DI BAWAH INI: */
+            background: url('indo-anniversary.png') no-repeat center center/cover;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
+            position: relative;
 
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             padding: 20px;
-            color: var(--text-color);
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
+        /* Overlay gelap jika menggunakan gambar background agar teks terbaca */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        .landing-card {
+            background: rgba(255, 255, 255, 0.98);
             padding: 50px 40px;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            max-width: 480px;
             width: 100%;
             text-align: center;
-            transition: transform 0.3s ease;
             position: relative;
             overflow: hidden;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Hiasan dekoratif di atas kartu */
-        .container::before {
+        /* Hiasan Garis Atas */
+        .landing-card::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 6px;
-            background: linear-gradient(90deg, #d32f2f, #ffffff);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
-        .icon-header {
-            font-size: 3.5rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            display: inline-block;
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: #eef2ff;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 25px auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         h1 {
-            color: #1a237e;
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            letter-spacing: -0.5px;
+            font-size: 1.75rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-weight: 700;
         }
 
         p {
-            color: #546e7a;
-            font-size: 1rem;
-            line-height: 1.6;
+            color: var(--gray);
             margin-bottom: 35px;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
-        .nav {
+        .btn-group {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        /* Style dasar tombol */
-        .btn {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 14px 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-decoration: none;
-            border-radius: 10px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.5px;
+        .btn-wa {
+            background: white;
+            color: #25D366;
+            /* Warna WA */
+            border: 2px solid #25D366;
         }
 
-        .btn i {
-            margin-right: 10px;
-        }
-
-        /* Tombol Login (Primary) */
-        .btn-primary {
-            background-color: var(--primary-color);
+        .btn-wa:hover {
+            background: #25D366;
             color: white;
-            box-shadow: 0 4px 15px rgba(13, 71, 161, 0.3);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(13, 71, 161, 0.4);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2);
         }
 
-        /* Tombol Register (Outline/Secondary) */
-        .btn-secondary {
-            background-color: white;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: #f0f4ff;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Responsiveness untuk layar tablet ke atas */
-        @media (min-width: 480px) {
-            .nav {
-                flex-direction: row;
-                justify-content: center;
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
             }
 
-            .btn {
-                flex: 1;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
+
+        .footer-credit {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #9ca3af;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <!-- Icon Kotak Suara -->
-        <!-- <div class="icon-header">
+
+    <div class="landing-card">
+        <div class="icon-circle">
             <i class="fas fa-vote-yea"></i>
-        </div> -->
+        </div>
 
-        <h1>Pemilihan Presiden</h1>
-        <p>Selamat datang di platform pemilihan presiden digital. Silakan login untuk memberikan suara kamu atau register untuk menjadi pemberi suara.</p>
+        <h1>E-Voting System</h1>
+        <p>Selamat datang di platform pemilihan presiden digital yang transparan dan efisien. Gunakan hak suara Anda untuk masa depan yang lebih baik.</p>
 
-        <div class="nav">
-            <a href="login.php" class="btn btn-primary">
-                <i class="fas fa-sign-in-alt"></i> Login
+        <div class="btn-group">
+            <a href="login.php" class="btn btn-primary" style="padding: 12px; font-size: 1rem; border-radius: 50px;">
+                <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Masuk ke Akun
             </a>
-            <a href="https://wa.link/uz3ox6" class="btn btn-secondary" target="_blank">
-                <i class="fa-brands fa-whatsapp"></i> Register
+
+            <a href="https://wa.link/uz3ox6" target="_blank" class="btn btn-wa" style="padding: 12px; font-size: 1rem; border-radius: 50px; font-weight: 600; text-decoration: none; transition: 0.3s;">
+                <i class="fab fa-whatsapp" style="margin-right: 8px;"></i> Daftar via WhatsApp
             </a>
         </div>
+
+        <div class="footer-credit">
+            &copy; <?php echo date('Y'); ?> E-Voting System. Created by <a href="#" style="color: var(--primary); text-decoration: none;">Guess Who I am</a>.
+        </div>
     </div>
+
 </body>
 
 </html>
